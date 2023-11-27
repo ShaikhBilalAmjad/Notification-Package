@@ -30,7 +30,7 @@ class SystemNotificationsServiceProvider extends ServiceProvider
         // Load the configuration file
         $this->mergeConfigFrom(__DIR__.'/../config/fcm.php', 'system-notifications.fcm');
         $this->publishes([
-            __DIR__.'/../config/fcm.php' => config_path('system-notifications/fcm.php'),
+            __DIR__.'/../config/fcm.php' => config_path('fcm.php'),
         ], 'system-notifications-config');
     }
 
