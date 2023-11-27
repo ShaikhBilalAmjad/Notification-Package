@@ -14,7 +14,7 @@ To install the `System Notifications` package, follow these steps:
 3. Run the following command to install the package:
 
 ```bash
-composer require 
+composer require notifications/system-notifications
 ```
 
 4. After the package is installed, Laravel will automatically discover the package and register its service provider.
