@@ -21,12 +21,12 @@
             "SystemNotifications\\": "src/"
         }
     },
-    "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/ShaikhBilalAmjad/Notification-Package.git"
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SystemNotifications\\SystemNotificationsServiceProvider"
+            ]
         }
-    ]
+    }
 }
