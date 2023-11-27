@@ -13,7 +13,7 @@
     "require": {
         "php": "^7.3",
         "illuminate/support": "^8.0",
-        "edwinhoksberg/php-fcm": "^1.2",
+        "edwinhoksberg/php-fcm": "^1.2"
 
     },
     "autoload": {
