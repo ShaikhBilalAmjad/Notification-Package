@@ -14,7 +14,7 @@
         "php": "^7.3",
         "illuminate/support": "^8.0",
         "edwinhoksberg/php-fcm": "^1.2",
-        "notifications/system-notifications": "1.0"
+
     },
     "autoload": {
         "psr-4": {
