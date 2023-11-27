@@ -1,0 +1,32 @@
+{
+    "name": "notifications/system-notifications",
+    "description": "System Notifications Package",
+    "type": "library",
+    "keywords": ["laravel", "notifications"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "illuminate/support": "^8.0",
+        "edwinhoksberg/php-fcm": "^1.2",
+        "notifications/system-notifications": "1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SystemNotifications\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/your-username/system-notifications.git"
+        }
+    ]
+}
