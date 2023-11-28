@@ -16,8 +16,20 @@ To install the `System Notifications` package, follow these steps:
 ```bash
 composer require notifications/system-notifications
 ```
+4. Run the following command to publish the config file named "fcm.php":
 
-4. After the package is installed, Laravel will automatically discover the package and register its service provider.
+```bash
+php artisan vendor:publish --provider="SystemNotifications\SystemNotificationsServiceProvider" --tag=system-notifications-config
+
+```
+5. In your Env file add Firebase configuration:
+
+```bash
+FCM_SERVER_KEY=your_firebase_key
+FCM_SENDER_ID=your_firebase_sender_id
+```
+
+6. After the package is installed, Laravel will automatically discover the package and register its service provider.
 
 
 1. Add the `SystemNotificationsServiceProvider` in the config/app.php providers section. For example:
