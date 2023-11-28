@@ -32,20 +32,6 @@ FCM_SENDER_ID=your_firebase_sender_id
 6. After the package is installed, Laravel will automatically discover the package and register its service provider.
 
 
-1. Add the `SystemNotificationsServiceProvider` in the config/app.php providers section. For example:
-
-```php
- 'providers' => [
-
-        /*
-         * Laravel Framework Service Providers...
-         */
-      
-        \SystemNotifications\SystemNotificationsServiceProvider::class,
-        
-        
-        ]
-```
 
 ## Usage
 

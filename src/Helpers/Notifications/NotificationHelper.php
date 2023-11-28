@@ -212,7 +212,6 @@ class NotificationHelper
         }
 
         Log::debug('check before send - self::$userInfo: ' . json_encode(self::$userInfo));
-
         // Send push notification
         if (!empty(self::$userInfo) && self::$processAction['push']) {
             $fcmTokens = self::$userInfo->fcm_tokens->pluck('token')->toArray();
@@ -228,12 +227,12 @@ class NotificationHelper
 
                     // Send push to user login session tables token
 
-                    dispatch(new PushNotificationJob($fcmTokens,$title, $message));
+                    dispatch(new PushNotificationJob($fcmTokens, $title, $message));
                 } else {
                     if (!empty($userFcmToken)) {
                         // Send push to user table token
                         Log::debug('fcm token: ' . $userFcmToken . ' message: ' . $message);
-                        dispatch(new PushNotificationJob([$userFcmToken],$title, $message));
+                        dispatch(new PushNotificationJob([$userFcmToken], $title, $message));
 
                     }
                 }
@@ -587,6 +586,7 @@ class NotificationHelper
             $emailNotificationPermission = DB::table('user_enable_notifications')
                 ->whereIn('user_type', ($userType == SEEKER) ? [SEEKER] : [EMPLOYER, RECRUITER])
                 ->where('user_id', self::$userInfo->id)
+                ->where('is_active', true)
                 ->where('notifiable_id', self::$emailTemplateInfo->id)
                 ->where('notifiable_type', 'App\Models\Notification\EmailNotification')
                 ->first();
@@ -599,7 +599,8 @@ class NotificationHelper
             $pushNotificationPermission = DB::table('user_enable_notifications')
                 ->whereIn('user_type', ($userType == SEEKER) ? [SEEKER] : [EMPLOYER, RECRUITER])
                 ->where('user_id', self::$userInfo->id)
-                ->where('notifiable_id', self::$emailTemplateInfo->id)
+                ->where('notifiable_id', self::$pushTemplateInfo->id)
+                ->where('is_active', true)
                 ->where('notifiable_type', 'App\Models\Notification\PushNotification')
                 ->first();
         } else {
@@ -609,20 +610,21 @@ class NotificationHelper
         // Check and set process actions based on permissions
         if (!$emailNotificationPermission) {
             self::$processAction['email'] = !(boolean)self::$emailTemplateInfo->user_enabled && (boolean)self::$emailTemplateInfo->status == "Publish";
-            self::$processAction['push'] = self::$userInfo && !(boolean)self::$pushTemplateInfo->user_enabled && (boolean)self::$pushTemplateInfo->status == "Publish";
         } else {
             $emailEnabled = self::$userInfo && (boolean)self::$userInfo->email_notification;
-            $pushEnabled = self::$userInfo && (boolean)self::$userInfo->push_notification;
-
-            // Check if email is available and build
             self::$processAction['email'] = $emailEnabled &&
-            (boolean)self::$emailTemplateInfo->user_enabled &&
             $emailNotificationPermission->is_active ?? false;
 
+        }
+        // Check and set process actions based on permissions
+        if (!$pushNotificationPermission) {
+            self::$processAction['push'] = !(boolean)self::$pushTemplateInfo->user_enabled && self::$userInfo && (boolean)self::$pushTemplateInfo->status == "Publish";
+        } else {
+            $pushEnabled = self::$userInfo && (boolean)self::$userInfo->push_notification;
             // Check if push is available and build
             self::$processAction['push'] = $pushEnabled &&
-            (boolean)self::$pushTemplateInfo->user_enabled &&
             $pushNotificationPermission->is_active ?? false;
+
         }
     }
 
@@ -641,8 +643,8 @@ class NotificationHelper
     {
         // Process email notification
         self::processEmail($user_type, $user_id, $template, self::$emailTemplateInfo, $macros, $toAdmin, $attachment, $replyTo);
-
         // Process push notification if applicable
+
         if (self::$processAction['push']) {
             self::processPush($user_type, $user_id, $macros, $template);
         }
@@ -652,10 +654,9 @@ class NotificationHelper
     public static function replaceMacros($template, array $macros = [])
     {
 
-        foreach($macros as $key => $value)
-        {
+        foreach ($macros as $key => $value) {
             $str = new Stringable($template);
-            $template = $str->replace('{{$'.$key.'}}',$value);
+            $template = $str->replace('{{$' . $key . '}}', $value);
         }
 
         return $template;
