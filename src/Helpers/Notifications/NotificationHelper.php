@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use SystemNotifications\Events\NotificationEvent;
+use SystemNotifications\Jobs\EmailNotificationJob;
+use SystemNotifications\Jobs\PushNotificationJob;
 use SystemNotifications\Traits\Notification\FCM;
 use Illuminate\Support\Stringable;
 
@@ -87,6 +89,7 @@ class NotificationHelper
     public static function initializeNotification($user_type, $user_id, $template, $macros, $toAdmin = false, $attachment = null, $replyTo = null)
     {
         try {
+
             // Retrieve user information, email template, and push template
             self::$userInfo = self::retrieveUserInfo($user_type, $user_id, $template);
             self::$emailTemplateInfo = self::getEmailNotificationTemplate($template);
@@ -139,7 +142,9 @@ class NotificationHelper
     {
         try {
             // Trigger the NotificationEvent event
-            event(new NotificationEvent(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
+
+            dispatch(new EmailNotificationJob(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
+//            event(new NotificationEvent(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
         } catch (Exception $e) {
             log::error($e->getMessage());
         }
@@ -184,7 +189,7 @@ class NotificationHelper
                         'destination' => ($userType == SEEKER) ? $userType : EMPLOYER,
                         'user_id' => self::$userInfo->id,
                         'reference_id' => $referenceId,
-                        'payload' => $macros['payload'],
+                        'payload' => $macros['payload'] ?? null,
                         'is_read' => 0,
                         'notification_template_id' => self::$pushTemplateInfo->id,
                         'notification_type' => $template,
@@ -222,15 +227,14 @@ class NotificationHelper
                     Log::debug('user has fcm tokens: ' . json_encode($fcmTokens));
 
                     // Send push to user login session tables token
-                    foreach ($fcmTokens as $fcmToken) {
-                        Log::debug('fcm token: ' . $fcmToken . ' message: ' . $message);
-                        $fcmTrait->sendFCM(['title' => $title, 'message' => $message], $fcmToken);
-                    }
+
+                    dispatch(new PushNotificationJob($fcmTokens,$title, $message));
                 } else {
                     if (!empty($userFcmToken)) {
                         // Send push to user table token
                         Log::debug('fcm token: ' . $userFcmToken . ' message: ' . $message);
-                        $fcmTrait->sendFCM(['title' => $title, 'message' => $message], $userFcmToken);
+                        dispatch(new PushNotificationJob([$userFcmToken],$title, $message));
+
                     }
                 }
             } catch (\Throwable $e) {
