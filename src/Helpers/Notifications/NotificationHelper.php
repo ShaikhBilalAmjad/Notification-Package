@@ -6,6 +6,7 @@ namespace SystemNotifications\Helpers\Notifications;
 use App\Models\Seeker;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -143,7 +144,7 @@ class NotificationHelper
         try {
             // Trigger the NotificationEvent event
 
-            dispatch(new EmailNotificationJob(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
+            Bus::dispatch(new EmailNotificationJob(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
 //            event(new NotificationEvent(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
         } catch (Exception $e) {
             log::error($e->getMessage());
@@ -227,12 +228,12 @@ class NotificationHelper
 
                     // Send push to user login session tables token
 
-                    dispatch(new PushNotificationJob($fcmTokens, $title, $message));
+                    Bus::dispatch(new PushNotificationJob($fcmTokens, $title, $message));
                 } else {
                     if (!empty($userFcmToken)) {
                         // Send push to user table token
                         Log::debug('fcm token: ' . $userFcmToken . ' message: ' . $message);
-                        dispatch(new PushNotificationJob([$userFcmToken], $title, $message));
+                        Bus::dispatch(new PushNotificationJob([$userFcmToken], $title, $message));
 
                     }
                 }
