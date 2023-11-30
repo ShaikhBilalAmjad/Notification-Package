@@ -14,7 +14,7 @@ use SystemNotifications\Mail\Notification\EmailAndNotification;
 
 class EmailNotificationJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue, Queueable, SerializesModels;
     protected $dataTable = [
         'employer' => 'employers',
         'seeker' => 'seekers',

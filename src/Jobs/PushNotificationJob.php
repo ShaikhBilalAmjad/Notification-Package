@@ -15,7 +15,7 @@ use SystemNotifications\Traits\Notification\FCM;
 
 class PushNotificationJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue, Queueable, SerializesModels;
     use FCM;
 
     protected $message;
