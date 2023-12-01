@@ -116,6 +116,8 @@ class EmailNotificationJob implements ShouldQueue
                 }
 
                 $mailer->send($controller);
+                Log::info('Email Sent Successfully');
+
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());

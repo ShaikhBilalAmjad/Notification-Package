@@ -108,6 +108,8 @@ class NotificationHelper
             self::retrieveAndCheckNotificationPermission($user_type, $user_id, $template);
             self::processEmailAndPushNotifications($user_type, $user_id, $template, $macros, $toAdmin, $attachment, $replyTo);
 
+            Log::info('Notifications Triggered Successfully');
+
             return true;
         } catch (Exception $e) {
             Log::error("Error while sending notification" . $e->getMessage());
@@ -143,8 +145,8 @@ class NotificationHelper
     {
         try {
             // Trigger the NotificationEvent event
-
             Bus::dispatch(new EmailNotificationJob(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
+            Log::info('Email notification Job Dispatched Successfully');
 //            event(new NotificationEvent(self::$userInfo, $userType, $userId, $template, $templateInfo, $macros, $toAdmin, $attachment, $replyTo, self::$userInfoCC, self::$userInfoBCC));
         } catch (Exception $e) {
             log::error($e->getMessage());
@@ -221,20 +223,24 @@ class NotificationHelper
             Log::debug('fcm tokens: ' . json_encode($fcmTokens));
 
             try {
-                $fcmTrait = new self();
 
                 if (!empty($fcmTokens)) {
                     Log::debug('user has fcm tokens: ' . json_encode($fcmTokens));
-
                     // Send push to user login session tables token
 
                     Bus::dispatch(new PushNotificationJob($fcmTokens, $title, $message));
+                    Log::info('Push notification Job Dispatched Successfully');
+
                 } else {
                     if (!empty($userFcmToken)) {
                         // Send push to user table token
                         Log::debug('fcm token: ' . $userFcmToken . ' message: ' . $message);
                         Bus::dispatch(new PushNotificationJob([$userFcmToken], $title, $message));
+                        Log::info('Push notification Job Dispatched Successfully');
 
+                    }
+                    else{
+                        Log::debug('User Do not have fcm tokens');
                     }
                 }
             } catch (\Throwable $e) {
