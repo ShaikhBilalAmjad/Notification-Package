@@ -80,8 +80,13 @@ class EmailNotificationJob implements ShouldQueue
                 $this->_variables,
                 $this->_attachments
             );
+            if ($this->_userType == null){
+                $this->_userInfo = $this->_userId;
+            }
+            else{
+                $this->_userInfo = $this->_userInfo->email;
+            }
 
-            $this->_userInfo = $this->_userInfo->email;
 
             if (!$this->_userInfo) {
                 $this->_userInfo = (env('APP_ENV') == 'production') ? 'andrew@sociabletech.com.au' : 'tariq@sociabletech.com.au';

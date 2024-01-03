@@ -91,8 +91,12 @@ class NotificationHelper
     {
         try {
 
+            if ($user_type != null){
+                self::$userInfo = self::retrieveUserInfo($user_type, $user_id, $template);
+                self::retrieveAndCheckNotificationPermission($user_type, $user_id, $template);
+
+            }
             // Retrieve user information, email template, and push template
-            self::$userInfo = self::retrieveUserInfo($user_type, $user_id, $template);
             self::$emailTemplateInfo = self::getEmailNotificationTemplate($template);
             self::$pushTemplateInfo = self::getPushNotificationTemplate($template);
 
@@ -105,7 +109,6 @@ class NotificationHelper
             }
 
             // Check notification permissions and process email/push notifications
-            self::retrieveAndCheckNotificationPermission($user_type, $user_id, $template);
             self::processEmailAndPushNotifications($user_type, $user_id, $template, $macros, $toAdmin, $attachment, $replyTo);
 
             Log::info('Notifications Triggered Successfully');
